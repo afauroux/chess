@@ -16,7 +16,7 @@
     <div class="container">
       <div class="chessboard "></div>
       <h1 class="status">White to move</h1>
-    </div>
+    
 
     <div class="container connection ">
       Your id is:
@@ -29,24 +29,38 @@
       <h4 id="connection-status">Not Connected -> Generate id</h4>
     </div>
 
-    <div class="container chatroom"   >
-        <form  onsubmit="submit(event);">
-            Name:
-            <input type="text"  id="chat-name"></input>
-            <input type="input" id="chat-input" ></input>
-            <button type="submit" id="send">Send</button>
+    <div class="container chatroom">
+      <form  onsubmit="event.preventDefault(); talk(); return false;">
+          <input type="input"  id="chat-input" ></input>
+          <button type="submit" id="send">Send</button>
+          <button onclick="undo();">Undo</button>
+          <button onclick="reset();">Reset</button>
         </form>
-      <textarea name="chat" id="chat" readonly></textarea>
-     
+        <textarea name="chat" id="chat" ></textarea>
+
+
+        <form class='hidden' onsubmit="event.preventDefault(); load_pgn(); return false;">
+          <input type="input" id="pgn-input"></input>
+          <button type="submit" id="loadpgn">Load pgn</button>
+        </form>
+        <textarea name="pgn" id="pgn" readonly></textarea>
+     </div>
     </div>
 
     <script src="libs/chess.js"></script>
-    <script src="main.js" async></script>
+    <script src="main.js" ></script>
 
     <style>
       :root {
         --black: #5d5656;
         --white: #ebe2db;
+        --boardsize: 360px;
+      }
+      @media screen and (max-width: 480) {
+        :root{
+          --boardsize: 100%;
+        
+        }
       }
       .container {
         display: flex;
@@ -58,37 +72,50 @@
         align-content: center;
         align-items: center;
       }
-
+      .piece{
+        width:calc(var(--boardsize)/8);
+        height:calc(var(--boardsize)/8);
+        box-sizing: border-box;
+         border: none;
+      }
+      .selected-piece{
+        border: 2px blue solid;
+      }
       .chessboard {
-        display: inline-block;
-
-        width: 480px;
-        height: 480px;
+        width: var(--boardsize);
+        height: var(--boardsize);
         display: grid;
-        grid-template-columns: repeat(8, 60px);
-        grid-template-rows: repeat(8, 60px);
+        grid-template-columns: repeat(8, calc(var(--boardsize)/8));
+        grid-template-rows: repeat(8, calc(var(--boardsize)/8));
         /*background-color: var(--white);*/
         box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
       }
-      #send {
-        margin: 5px;
-        width:50px;
+      
+      button {
+        margin: 2px;
+        
       }
+      form{
+        display:flex;
+        width:var(--boardsize);
+      }
+      
       #chat{
-          width:480px;
+        width:var(--boardsize);
+          height: 50px;
+          margin:2px;
+      }
+      #pgn{
+        width:var(--boardsize);
           height: 300px;
           margin:2px;
       }
-      #chat-name{
-        width:40px;
-        margin:5px;
+      input{
+        margin:0px;
+        flex:1;
 
       }
-      #chat-input{
-        width:300px;
-        margin:5px;
-
-      }
+     
       .hidden{
         display: none;
       }
