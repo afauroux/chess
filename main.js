@@ -116,36 +116,7 @@ function loadFromhash() {
   }
   redraw();
 }
-// ----------------------------------- PEERING --------------------
-function initPeer() {
-  peer.on("open", function(id) {
-    console.log("My peer ID is: " + id);
-    document.querySelector(".myid").value = id;
-  });
 
-  return peer;
-}
-function connect() {
-  window.open("fb-messenger://share?link=" + window.location.href);
-}
-/*
-  let hisid = document.querySelector(".hisid").value;
-  var conn = peer.connect(hisid);
-  console.log("trying to connect...");
-  peer.on("connection", function(conn) {
-    console.log("connected");
-  });
-
-  conn.on("open", function() {
-    // Receive messages
-    conn.on("data", function(data) {
-      console.log("Received", data);
-    });
-
-    // Send messages
-    conn.send("Hello!");
-  });
-}*/
 // ----------------------------------- MAIN -----------------------
 let chess = new Chess();
 
@@ -156,12 +127,16 @@ let cells = [[], [], [], [], [], [], [], []];
 drawBoard();
 loadFromhash(); //if the window was loaded with some hash
 redraw();
+
+// ----------------------------------- PEERING --------------------
+
 var RTCPeerConnection =
   window.RTCPeerConnection || webkitRTCPeerConnection || mozRTCPeerConnection;
 var peerConn = new RTCPeerConnection({
   iceServers: [{ urls: ["stun:stun.l.google.com:19302"] }]
 });
-//console.log('Call create(), or join("some offer")');
+console.log('Call call call create(), or join("some offer")');
+
 function create() {
   console.log("Creating ...");
   var dataChannel = peerConn.createDataChannel("test");
