@@ -161,7 +161,7 @@ var RTCPeerConnection =
 var peerConn = new RTCPeerConnection({
   iceServers: [{ urls: ["stun:stun.l.google.com:19302"] }]
 });
-console.log('Call create(), or join("some offer")');
+//console.log('Call create(), or join("some offer")');
 function create() {
   console.log("Creating ...");
   var dataChannel = peerConn.createDataChannel("test");
@@ -187,6 +187,11 @@ function create() {
         JSON.stringify(peerConn.localDescription),
         ")"
       );
+      document.querySelector("#myid").value = JSON.stringify(
+        peerConn.localDescription
+      );
+    } else {
+      document.querySelector("#myid").value = "null";
     }
   };
   window.gotAnswer = answer => {
@@ -197,7 +202,9 @@ function create() {
 
 function join(offer) {
   console.log("Joining ...");
-
+  if (offer == null) {
+    offer = document.querySelector("#hisid").value;
+  }
   peerConn.ondatachannel = e => {
     var dataChannel = e.channel;
     dataChannel.onopen = e => {
@@ -228,3 +235,5 @@ function join(offer) {
     .then(answerDesc => peerConn.setLocalDescription(answerDesc))
     .catch(err => console.warn("Couldn't create answer"));
 }
+
+create();
