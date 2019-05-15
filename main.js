@@ -277,8 +277,11 @@ function receivedMessage(msg) {
   if ((msg + "").match(/Connected Succesfully !/) != null && !idgenerated)
     gotAnswer();
   let m = msg.match(/move:(.*)/);
-  if (m != null) m = makemove(m[1], true);
-  chat.value += msg;
+  if (m != null) {
+    m = makemove(m[1], true);
+  } else {
+    chat.value += msg;
+  }
 }
 
 function sendMessage(msg) {
@@ -287,6 +290,9 @@ function sendMessage(msg) {
   msg = msg + "\n";
   if (dataChannel != null) dataChannel.send(msg);
   let m = msg.match(/move:(.*)/);
-  if (m != null) m = makemove(m[1], false);
-  chat.value += msg;
+  if (m != null) {
+    m = makemove(m[1], false);
+  } else {
+    chat.value += msg;
+  }
 }
