@@ -145,8 +145,9 @@ function makemove(object, oponent) {
   let playeriswhite = oponent ? !amiwhite : amiwhite;
 
   if (
-    (playeriswhite && chess.turn() != "w") ||
-    (!playeriswhite && chess.turn() != "b")
+    connected &&
+    ((playeriswhite && chess.turn() != "w") ||
+      (!playeriswhite && chess.turn() != "b"))
   )
     return;
   let m = chess.move(object);

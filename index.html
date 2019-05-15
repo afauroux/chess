@@ -33,14 +33,15 @@
       <form  onsubmit="event.preventDefault(); talk(); return false;">
           <input type="input"  id="chat-input" ></input>
           <button type="submit" id="send">Send</button>
-          <button onclick="undo();">Undo</button>
-          <button onclick="reset();">Reset</button>
+          
         </form>
         <textarea name="chat" id="chat" ></textarea>
 
 
-        <form class='hidden' onsubmit="event.preventDefault(); load_pgn(); return false;">
+        <form  onsubmit="event.preventDefault(); load_pgn(); return false;">
           <input type="input" id="pgn-input"></input>
+          <button onclick="reset();">Reset</button>
+          <button onclick="undo();">Undo</button>
           <button type="submit" id="loadpgn">Load pgn</button>
         </form>
         <textarea name="pgn" id="pgn" readonly></textarea>
@@ -54,11 +55,11 @@
       :root {
         --black: #5d5656;
         --white: #ebe2db;
-        --boardsize: 360px;
+        --boardsize: 500px;
       }
       @media screen and (max-width: 480) {
         :root{
-          --boardsize: 100%;
+          --boardsize: 360px;;
         
         }
       }
