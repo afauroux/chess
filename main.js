@@ -228,6 +228,7 @@ function join(offer) {
 
 function talk(e) {
   e.preventDefault();
+  console.log(e);
   let input = document.querySelector("#chat-input");
   say(input.value);
 }
