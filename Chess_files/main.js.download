@@ -30,7 +30,7 @@ function drawBoard() {
         let piece = e.dataTransfer.getData("piece");
         let color = e.dataTransfer.getData("color");
         let from = e.dataTransfer.getData("from");
-        makemove({from:from, to:this.id}, false);
+        makemove(from, this.id);
       };
       div.ondragover = function(e) {
         e.preventDefault();
@@ -87,8 +87,7 @@ function checkStatus() {
     //a piece is taken
     audio = document.querySelector(".clouch");
   }
-  
-  stat.innerHTML = status;
+  stat.value = status;
   audio.volume = 0.1;
   audio.play();
 }
@@ -100,19 +99,13 @@ function undo() {
   chess.undo();
   redraw();
 }
-function makemove(object, oponent) {
-    if(amiwhite==null){
-      amiwhite = !oponent;  
-    }
-  let m = chess.move(object);
+function makemove(from, to) {
+  let m = chess.move({ from: from, to: to });
   if (m != null) {
     // it was an ok move !
     redraw();
     window.location.hash = chess.fen().replace(/ /g, "_");
     checkStatus();
-    if(!oponent){
-        sendMessage(object)
-    }
   }
   return m;
 }
@@ -133,10 +126,6 @@ let hisid = document.querySelector("#hisid");
 let myid = document.querySelector("#myid");
 let answer = document.querySelector("#answer");
 let connStat = document.querySelector("#connection-status");
-let chat = document.querySelector('#chat')
-let chatInput = document.querySelector('#chat-input')
-
-let dataChannel = null;
 let idgenerated = false;
 var RTCPeerConnection =
   window.RTCPeerConnection || webkitRTCPeerConnection || mozRTCPeerConnection;
@@ -147,11 +136,16 @@ var peerConn = new RTCPeerConnection({
 
 function create() {
   connStat.innerHTML = "Creating ...";
-  dataChannel = peerConn.createDataChannel("chess");
+  var dataChannel = peerConn.createDataChannel("chess");
   dataChannel.onopen = e => {
-    sendMessage('Connected Succesfully !')
+    window.say = msg => {
+      dataChannel.send(msg);
+    };
+    console.log('Say things with say("hi")');
   };
-  dataChannel.onmessage = e=>receivedMessage(e.data);
+  dataChannel.onmessage = e => {
+    console.log("Got message:", e.data);
+  };
   peerConn
     .createOffer({})
     .then(desc => peerConn.setLocalDescription(desc))
@@ -190,13 +184,24 @@ function join(offer) {
     offer = JSON.parse(document.querySelector("#hisid").value);
   }
   peerConn.ondatachannel = e => {
-    dataChannel = e.channel;
+    var dataChannel = e.channel;
     dataChannel.onopen = e => {
-      sendMessage('Connected Succesfully!')
+      window.say = msg => {
+        dataChannel.send(msg);
+      };
+      console.log('Say things with say("hi")');
     };
-    dataChannel.onmessage = e => receivedMessage(e.data);
-
-    
+    dataChannel.onmessage = e => {
+      console.log("Got message:", e.data);
+      let out = document.querySelector("#chat");
+      let move = (e.data+"").match(/Made move: .*([a-](.*), to/)
+      if(move != null){
+        out.value +=  e.data + "\n";
+        makemove()
+      }
+      out.value += "Got message: " + e.data + "\n";
+      
+    };
   };
 
   peerConn.onicecandidate = e => {
@@ -218,41 +223,25 @@ function join(offer) {
     .then(answerDesc => peerConn.setLocalDescription(answerDesc))
     .catch(err => console.warn("Couldn't create answer"));
 }
-function myName(){
-    let name = document.querySelector("#chat-name").value;
-    return name!='' ? name : 'anonymous'
-}
-function submit(e) {
+
+function talk(e) {
     e.preventDefault(); 
-    try{
+    try {
         let input = document.querySelector("#chat-input");
-        sendingMessage(input.value)
-    } catch (err) {
-        //throw new Error(err.message);
+        console.log(input.value);
+        say(input.value);
+    } catch (e) {
+     throw new Error(e.message);
     }
     return false;
   }
 
-
-  function receivedMessage(msg){  //-----------------  You got mail !
-        console.log( msg);  
-        if((msg+"").match(/Connected Succesfully !/) != null &&  !idgenerated)gotAnswer();
-        let m = makemove(msg.split(':')[1], true);
-        chat.value += msg;
-  }
-
-  function sendMessage(msg){ //-----------------  sending mail !
-    msg = myName()+' said : '+msg+'\n';
-    if(dataChannel!= null)dataChannel.send(msg);
-  }
-      
 
 
 
 
 // ----------------------------------- MAIN -----------------------
 let chess = new Chess();
-let amiwhite = null;
 
 window.onhashchange = loadFromhash;
 
