@@ -129,16 +129,20 @@ loadFromhash(); //if the window was loaded with some hash
 redraw();
 
 // ----------------------------------- PEERING --------------------
-
+let hisid = document.querySelector("#hisid");
+let myid = document.querySelector("#myid");
+let answer = document.querySelector("#answer");
+let connStat = document.querySelector("#connection-status");
+let idgenerated = false;
 var RTCPeerConnection =
   window.RTCPeerConnection || webkitRTCPeerConnection || mozRTCPeerConnection;
 var peerConn = new RTCPeerConnection({
   iceServers: [{ urls: ["stun:stun.l.google.com:19302"] }]
 });
-console.log('Call call call create(), or join("some offer")');
+//console.log('Call create(), or join("some offer")');
 
 function create() {
-  console.log("Creating ...");
+  connStat.innerHTML = "Creating ...";
   var dataChannel = peerConn.createDataChannel("test");
   dataChannel.onopen = e => {
     window.say = msg => {
@@ -152,7 +156,7 @@ function create() {
   peerConn
     .createOffer({})
     .then(desc => peerConn.setLocalDescription(desc))
-    .then(() => {})
+    .then(() => (idgenerated = true))
     .catch(err => console.error(err));
   peerConn.onicecandidate = e => {
     if (e.candidate == null) {
@@ -162,24 +166,31 @@ function create() {
         JSON.stringify(peerConn.localDescription),
         ")"
       );
-      document.querySelector("#myid").value = JSON.stringify(
-        peerConn.localDescription
-      );
+      connStat.innerHTML = "Send your id to partner";
+      myid.value = JSON.stringify(peerConn.localDescription);
     } else {
-      document.querySelector("#myid").value = "null";
+      myid.value = "null";
     }
   };
-  window.gotAnswer = answer => {
-    console.log("Initializing ...");
-    peerConn.setRemoteDescription(new RTCSessionDescription(answer));
-  };
 }
-
+function gotAnswer() {
+  peerConn.setRemoteDescription(
+    new RTCSessionDescription(JSON.parse(hisid.value))
+  );
+  connStat.innerHTML = "Connected";
+  document.querySelector(".connection").classList.add("hidden");
+  document.querySelector(".chatroom").classList.remove("hidden");
+}
 function join(offer) {
-  console.log("Joining ...");
-  if (offer == null) {
-    offer = document.querySelector("#hisid").value;
+  if (idgenerated) {
+    gotAnswer();
+    return;
   }
+  connStat.innerHTML = "Joining ...";
+  if (offer == null) {
+    offer = JSON.parse(document.querySelector("#hisid").value);
+  }
+  console.log(offer);
   peerConn.ondatachannel = e => {
     var dataChannel = e.channel;
     dataChannel.onopen = e => {
@@ -190,6 +201,8 @@ function join(offer) {
     };
     dataChannel.onmessage = e => {
       console.log("Got message:", e.data);
+      let out = document.querySelector("#chat");
+      out += e.data + "\n";
     };
   };
 
@@ -200,6 +213,8 @@ function join(offer) {
         JSON.stringify(peerConn.localDescription),
         ")"
       );
+      myid.value = JSON.stringify(peerConn.localDescription);
+      connStat.innerHTML = "Connected ! Send your id to partner";
     }
   };
 
@@ -211,4 +226,8 @@ function join(offer) {
     .catch(err => console.warn("Couldn't create answer"));
 }
 
-create();
+function talk(e) {
+  e.preventDefault();
+  let input = document.querySelector("#chat-input");
+  say(input.value);
+}
