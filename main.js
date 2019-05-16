@@ -166,8 +166,15 @@ function makemove(object, oponent) {
   }
   return m;
 }
-
+window.onpopstate = function(event){
+    if(event.state != null){
+        chess.load_pgn(event.state)
+        redraw()
+    }
+   
+}
 function loadFromhash() {
+    console.log('loadfromhash')
   let fen = window.location.hash.replace(/_/g, " ").replace("#", "");
   if (fen != "") {
     if (chess.fen() != fen) {
@@ -181,13 +188,14 @@ function loadFromhash() {
 function load_pgn() {
   try {
     chess.load_pgn("" + document.querySelector("#pgn").value);
-    fens = [chess.fen()];
-
+    states = [{fen: chess.fen(), pgn: chess.pgn()}];
+  
     while (chess.undo()) {
-      fens.push(chess.fen());
+      states.push({fen: chess.fen(), pgn: chess.pgn()});
+
     }
-    fens.reverse().forEach(fen => {
-      history.pushState(null, null, "#" + fen.replace(/ /g, "_"));
+    states.reverse().forEach(state => {
+      history.pushState(state.pgn, null, "#" + state.fen.replace(/ /g, "_"));
     });
     chess.load_pgn("" + document.querySelector("#pgn").value);
     redraw();
