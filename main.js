@@ -175,10 +175,20 @@ function loadFromhash() {
     }
   }
   redraw();
+  window.scrollTo(0, 0);
 }
 
 function load_pgn() {
   try {
+    chess.load_pgn("" + document.querySelector("#pgn").value);
+    fens = [chess.fen()];
+
+    while (chess.undo()) {
+      fens.push(chess.fen());
+    }
+    fens.reverse().forEach(fen => {
+      history.pushState(null, null, "#" + fen.replace(/ /g, "_"));
+    });
     chess.load_pgn("" + document.querySelector("#pgn").value);
     redraw();
   } catch (err) {
