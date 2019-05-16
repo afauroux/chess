@@ -17,8 +17,26 @@
       <div class="chessboard "></div>
       <h1 class="status">White to move</h1>
     
-
+      <div class="container chatroom">
+        <form  onsubmit="event.preventDefault(); talk(); return false;">
+            <input type="input"  id="chat-input" ></input>
+            <button type="submit" id="send">Send</button>
+            
+          </form>
+          <textarea name="chat" id="chat" ></textarea>
+  
+  
+          <form  onsubmit="event.preventDefault(); load_pgn(); return false;">
+            <button onclick="reset();">Reset</button>
+            <button onclick="undo();">Undo</button>
+            <button type="submit" id="loadpgn">Load pgn</button>
+          </form>
+          <textarea name="pgn" id="pgn" ></textarea>
+       </div>
+      </div>
+      
     <div class="container connection ">
+      <h2>Connect via p2p</h2>
       Your id is:
       <input id="myid" readonly />
       <button onclick="create();">generate</button>
@@ -29,24 +47,6 @@
       <h4 id="connection-status">Not Connected -> Generate id</h4>
     </div>
 
-    <div class="container chatroom">
-      <form  onsubmit="event.preventDefault(); talk(); return false;">
-          <input type="input"  id="chat-input" ></input>
-          <button type="submit" id="send">Send</button>
-          
-        </form>
-        <textarea name="chat" id="chat" ></textarea>
-
-
-        <form  onsubmit="event.preventDefault(); load_pgn(); return false;">
-          <input type="input" id="pgn-input"></input>
-          <button onclick="reset();">Reset</button>
-          <button onclick="undo();">Undo</button>
-          <button type="submit" id="loadpgn">Load pgn</button>
-        </form>
-        <textarea name="pgn" id="pgn" readonly></textarea>
-     </div>
-    </div>
 
     <script src="libs/chess.js"></script>
     <script src="main.js" ></script>
@@ -72,7 +72,9 @@
         justify-content: center;
         align-content: center;
         align-items: center;
+        
       }
+   
       .piece{
         width:calc(var(--boardsize)/8);
         height:calc(var(--boardsize)/8);

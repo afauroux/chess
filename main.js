@@ -46,7 +46,11 @@ function drawBoard() {
         let piece = e.dataTransfer.getData("piece");
         let color = e.dataTransfer.getData("color");
         let from = e.dataTransfer.getData("from");
-        makemove({ from: from, to: this.id }, false);
+        if (piece == "p" && this.id.match(/[a-z]1?8?/) != null) {
+          makemove({ from: from, to: this.id, promotion: "q" }, false);
+        } else {
+          makemove({ from: from, to: this.id }, false);
+        }
       };
       div.ondragover = function(e) {
         e.preventDefault();
@@ -162,6 +166,7 @@ function makemove(object, oponent) {
   }
   return m;
 }
+
 function loadFromhash() {
   let fen = window.location.hash.replace(/_/g, " ").replace("#", "");
   if (fen != "") {
@@ -174,10 +179,10 @@ function loadFromhash() {
 
 function load_pgn() {
   try {
-    chess.load_pgn(document.querySelector("#pgn-input").value);
+    chess.load_pgn("" + document.querySelector("#pgn").value);
     redraw();
   } catch (err) {
-    console.log.err(err);
+    console.error(err);
   }
   return false;
 }
